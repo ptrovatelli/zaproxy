@@ -99,7 +99,7 @@ public class CookieBasedSessionManagementMethodType extends SessionManagementMet
 			
 			session.getHttpState().purgeExpiredCookies();
 
-			// Remove any cookies that will be added by the HttpState from the message
+			// Update cookies values from the HttpState to the message
 			List<HttpCookie> cookies = message.getRequestHeader().getHttpCookies();
 			Iterator<HttpCookie> it = cookies.iterator();
 			
@@ -107,7 +107,10 @@ public class CookieBasedSessionManagementMethodType extends SessionManagementMet
 				HttpCookie c = it.next();
 				for (Cookie sc : session.getHttpState().getCookies())
 					if (sc.getName().equals(c.getName())) {
-						it.remove();
+						if(log.isDebugEnabled()){
+							log.debug("COOKIES: processMessageToMatchSession : change value of " + c.getName() + ":" + c.getValue() + " to match httpState value : " + sc.getValue());
+						}
+						c.setValue(sc.getValue());
 						break;
 					}
 			}
